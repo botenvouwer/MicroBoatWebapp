@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 	<head>
-		<title>PaperBoat Webapp</title>
+		<title>PaperBoat Webapp 0.0.1</title>
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<meta name="action-url" content="http://localhost:8080/webapp.js/action.php">
 		<meta name="action-start" action="start" />
@@ -13,6 +13,6 @@
 		<script type="text/javascript" src="http://localhost:8080/webapp.js/js/webapp.js"></script>
 	</head>
 	<body>
-		<button class="btn" action="start" level="start">test</button>
+		hallo welrejtsdury
 	</body>
 </html>
