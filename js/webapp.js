@@ -3,7 +3,7 @@
 */
 
 $(document).ready(function () {
-
+	
 	//start actions
 	showajaxloader(false);
 	
@@ -19,7 +19,7 @@ $(document).ready(function () {
 	}
 
 	window.action_url = $('meta[name="action-url"]').attr("content");
-	
+	console.log(window.action_url);
 	//key action handler
 	$('body').on('keyup', function(e) {
 		if(e.keyCode === 13){
@@ -249,7 +249,7 @@ function actionhandler(deze, call){
 	if(method == 'ajax'){
 		//preload
 		$.ajax({
-			url: action_url+'?action=' + action + '&level=' + level + param,
+			url: window.action_url+'?action=' + action + '&level=' + level + param,
 			type: 'POST',
 			/*xhr: function() {
 				var myXhr = $.ajaxSettings.xhr();
@@ -273,7 +273,7 @@ function actionhandler(deze, call){
 	}
 	else if(method == 'ajax_files'){
 		$.ajax({
-			url: action_url+'?action=' + action + '&level=' + level + param,
+			url: window.action_url+'?action=' + action + '&level=' + level + param,
 			type: 'POST',
 			xhr: function() {
 				var myXhr = $.ajaxSettings.xhr();
@@ -555,7 +555,7 @@ function datalader(data){
 				#to do
 				
 				*	put animations in big array
-				*	create rondom annimation function
+				*	create random annimation function
 			*/
 		if(!animate){
 			animate = false;
