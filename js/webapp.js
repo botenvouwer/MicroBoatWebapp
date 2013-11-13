@@ -6,6 +6,7 @@ $(document).ready(function () {
 	
 	//start actions
 	showajaxloader(false);
+	window.action_url = $('meta[name="action-url"]').attr("content");
 	
 	if($('meta[name="action-start"]').length>0){
 		actionhandler($('meta[name="action-start"]'));
@@ -17,9 +18,7 @@ $(document).ready(function () {
 	else{
 		window.containment = 'html';
 	}
-
-	window.action_url = $('meta[name="action-url"]').attr("content");
-	console.log(window.action_url);
+	
 	//key action handler
 	$('body').on('keyup', function(e) {
 		if(e.keyCode === 13){
