@@ -1,5 +1,5 @@
 /*!
-	webapp 0.0.1 | William © Botenvouwer
+	webapp 0.0.2 | William © Botenvouwer
 */
 
 $(document).ready(function () {
