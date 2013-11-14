@@ -8,10 +8,6 @@ $(document).ready(function () {
 	showajaxloader(false);
 	window.action_url = $('meta[name="action-url"]').attr("content");
 	
-	if($('meta[name="action-start"]').length>0){
-		actionhandler($('meta[name="action-start"]'));
-	}
-	
 	if($('meta[name="dialog-containment"]').length>0){
 		window.containment = $('meta[name="dialog-containment"]').attr('content');
 	}
@@ -32,6 +28,11 @@ $(document).ready(function () {
 			}
 		}	
 	});
+	
+	$(document).find('load').each(function(id, deze) {
+		actionhandler(deze);
+		$(deze).remove();
+	});	
 	
 	//ajax listners
 	$(document).ajaxStart(function() {
@@ -261,7 +262,7 @@ function actionhandler(deze, call){
 				
 			},*/
 			success: function (data) {
-				datalader(data);
+				xhtmlNodesHandler(data);
 			},
 			error: function () {
 				error('A015','Request failed');
@@ -286,7 +287,7 @@ function actionhandler(deze, call){
 			},
 			success: function (data) {
 				$('progress.overalprog').attr({value:100,max:100});
-				datalader(data);
+				xhtmlNodesHandler(data);
 				$('progress.uploadprog').attr({value:0,max:100});
 				$('progress.overalprog').attr({value:0,max:100});
 			},
@@ -307,7 +308,7 @@ function actionhandler(deze, call){
 			if(typeof action[level] == 'function') { 
 				action[level]();
 				if(action.html){
-					datalader(action.html);
+					xhtmlNodesHandler(action.html);
 				}
 			}
 			else{
@@ -324,8 +325,8 @@ function actionhandler(deze, call){
 	action_old = action;
 }
 
-//html datalader: loops trough all <start>, <redirect>, <refresh>, <reload>, <action>, <dialog>, <load>, <empty>, <change>, <delete>, <error> elements and loads the data inside the html page or executes the given command.
-function datalader(data){
+//html xhtmlNodesHandler: loops trough all <start>, <redirect>, <refresh>, <reload>, <action>, <dialog>, <load>, <empty>, <change>, <delete>, <error> elements and loads the data inside the html page or executes the given command.
+function xhtmlNodesHandler(data){
 	
 	//load a start element
 	$('<wtf/>').html(data).find('start').each(function(id, deze) {
@@ -533,16 +534,16 @@ function datalader(data){
 	$('<wtf/>').html(data).find('load').each(function(id, deze) {
 		
 		var method = $(deze).attr("method");
-		var animate = $(deze).attr("animate");
-	    var locatie = $(deze).attr("id");
+		var animate = $(deze).attr("effect");
+	    var query = $(deze).attr("query");
 		var html = $(deze).html();
 		
 		if(!method){
 			method = 'overide';
 		}
 		
-		if(!locatie){
-			error('A002','No loadloc');
+		if(!query){
+			error('A002','Query is needed to utilize <load> like: <load query=".classquery">content</load>');
 		}
 		
 		if(!html){
@@ -619,7 +620,7 @@ function datalader(data){
 		}
 		
 		if(animate){
-			$('#' + locatie).hide(effectout, optionsout, timeout, load);
+			$(query).hide(effectout, optionsout, timeout, load);
 		}
 		else{
 			load();
@@ -627,24 +628,24 @@ function datalader(data){
 		
 		function load(){
 			if(method == 'overide'){
-				$('#' + locatie).html(html);
+				$(query).html(html);
 			}
 			else if(method == 'tablerow'){
 				html = $('tr', deze).html();
-				$('#' + locatie).html(html);
+				$(query).html(html);
 			}
 			else if(method == 'append'){
-				$('#' + locatie).append(html);
+				$(query).append(html);
 			}
 			else if(method == 'prepend'){
-				$('#' + locatie).prepend(html);
+				$(query).prepend(html);
 			}
 			else{
 				error('A007','load method: "' + method + '" does not exist');
 			}
 			
 			if(animate){
-				$('#' + locatie).show(effectin, optionsin, timein);
+				$(query).show(effectin, optionsin, timein);
 			}
 		}
 	});

@@ -4,7 +4,6 @@
 		<title>PaperBoat Webapp 0.0.1</title>
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<meta name="action-url" content="http://localhost:8080/webapp.js/action.php">
-		<meta name="action-start" action="start" />
 		<link rel="stylesheet" href="http://localhost:8080/webapp.js/css/jquery-ui.css" type="text/css">
 		<link rel="stylesheet" href="http://localhost:8080/webapp.js/css/changeofui.css" type="text/css">
 		<link rel="stylesheet" href="http://localhost:8080/webapp.js/style.css" type="text/css">
@@ -13,6 +12,6 @@
 		<script type="text/javascript" src="http://localhost:8080/webapp.js/js/webapp.js"></script>
 	</head>
 	<body>
-		hallo welrejtsdury
+		<load action="start" ></load>
 	</body>
 </html>
