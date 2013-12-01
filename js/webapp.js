@@ -1,5 +1,5 @@
 /*!
-	webapp 0.0.2 | William © Botenvouwer
+	webapp 0.0.3 | William © Botenvouwer
 */
 
 $(document).ready(function () {
@@ -652,36 +652,36 @@ function xhtmlNodesHandler(data){
 	
 	// empty an node by id
 	$('<wtf/>').html(data).find('empty').each(function(id, deze) {
-		var locatie = $(deze).attr("id");
-		if(!locatie){
+		var query = $(deze).attr("query");
+		if(!query){
 			error('A002','No loadloc in <empty>');
 			return;
 		}
-		$('#' + locatie).empty();
+		$(query).empty();
 	});	
 
 	// change a nodes attributes by id
 	$('<wtf/>').html(data).find('change').each(function(id, deze) {
-		var locatie = $(deze).attr("id");
+		var query = $(deze).attr("id");
 		
 		$.each(this.attributes, function(i, attrib){
 			var name = attrib.name;
 			var value = attrib.value;
 			
-			if(name != 'id'){
-				$('#'+locatie).attr(name, value);
+			if(name != 'query'){
+				$(query).attr(name, value);
 			}
 		});
 	});	
 	
 	// delete a node by id
 	$('<wtf/>').html(data).find('delete').each(function(id, deze) {
-		var locatie = $(deze).attr("id");
-		if(!locatie){
+		var query = $(deze).attr("query");
+		if(!query){
 			error('A002','No loadloc in <delete>');
 			return;
 		}
-		$('#' + locatie).remove();
+		$(query).remove();
 	});	
 	
 	// outputs any php error to the console
