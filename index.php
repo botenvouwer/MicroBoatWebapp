@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 	<head>
-		<title>PaperBoat Webapp 0.0.3</title>
+		<title>PaperBoat Webapp 0.0.4</title>
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<meta name="action-url" content="http://localhost:8080/webapp.js/action.php">
 		<link rel="stylesheet" href="http://localhost:8080/webapp.js/css/jquery-ui.css" type="text/css">
@@ -12,6 +12,6 @@
 		<script type="text/javascript" src="http://localhost:8080/webapp.js/js/webapp.js"></script>
 	</head>
 	<body>
-		<load action="start" ></load>
+		<load action="start" param="'string', 23, true" ></load>
 	</body>
 </html>

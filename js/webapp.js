@@ -1,25 +1,47 @@
 /*!
-	webapp 0.0.3 | William © Botenvouwer
+	webapp 0.0.4 | William © Botenvouwer
 */
+
+var singlemode = null;
+var action_old = null;
+var form = null;
+var action_url = '';
 
 $(document).ready(function () {
 	
 	//start actions
 	showajaxloader(false);
-	window.action_url = $('meta[name="action-url"]').attr("content");
+	action_url = $('meta[name="action-url"]').attr("content");
 	
+	//Remove
 	if($('meta[name="dialog-containment"]').length>0){
 		window.containment = $('meta[name="dialog-containment"]').attr('content');
 	}
 	else{
 		window.containment = 'html';
 	}
+	//Remove end
 	
-	//key action handler
+	$(document).find('load').each(function(id, deze) {
+		actionhandler(deze, 0);
+		$(deze).remove();
+	});	
+	
+	//Main ajax load animation functionality
+	$(document).ajaxStart(function() {
+	   	showHideAjaxLoadAnimation(true, ".webapp_ajax");
+	});
+	
+	$(document).ajaxStop(function() {
+	    showHideAjaxLoadAnimation(false, ".webapp_ajax");
+	});
+	
+	//event handlers for all type of events
+	
 	$('body').on('keyup', function(e) {
 		if(e.keyCode === 13){
 			if($('.enter').length > 0){
-				actionhandler($('.enter'));
+				actionhandler($('.enter'), 0);
 			}
 		}	
 		else if(e.keyCode === 27){
@@ -29,70 +51,7 @@ $(document).ready(function () {
 		}	
 	});
 	
-	$(document).find('load').each(function(id, deze) {
-		actionhandler(deze);
-		$(deze).remove();
-	});	
-	
-	//ajax listners
-	$(document).ajaxStart(function() {
-	   	showajaxloader(true);
-	});
-	
-	$(document).ajaxStop(function() {
-	    showajaxloader(false);
-	});
-	
-	//onchange action handlers
-	$('body').on('change', '.change', function(){
-		actionhandler(this);
-	});
-	
-	//button action handlers
-	$('body').on('click', '.btn', function(){
-		actionhandler(this);
-	});	
-
-	$('body').on('click', '.button', function(){
-		actionhandler(this);
-	});
-	
-	$('body').on('dblclick', '.dbtn', function(){
-		actionhandler(this);
-	});
-
-	$('body').on('dblclick', '.dubbel_click_button', function(){
-		actionhandler(this);
-	});
-
-	$('body').on('mousedown', '.mousedown', function(){
-		actionhandler(this);
-	});
-	
-	//special button handler for single and double click
-	$('body').on('click', '.dubbel_button', function() {
-	   	var that = this;
-		var dblclick = $(that).data('clicks');
-		if(!dblclick){
-			dblclick = 0;
-		}
-		dblclick = dblclick + 1;
-	    $(that).data('clicks', dblclick);
-		
-		if($(that).data('clicks') > 1){
-	    	$(that).data('clicks', 0);
-			actionhandler(that, 1);
-		}	
-		
-	    setTimeout(function() {
-			if($(that).data('clicks') == 1){
-				$(that).data('clicks', 0);
-				actionhandler(that, 0);
-			}
-	    }, 180);
-	});
-	
-	//other actions
+	//make shure the window wich is drawed is showed up front
 	var old_id = 0;
 	$('body').on('mousedown', '.draggable', function(){
 		var id = $(this).attr("id");
@@ -108,148 +67,68 @@ $(document).ready(function () {
 //#functions------------------------------------------------------------------------
 
 //action handler looks what to do with a button and executes the desired handling
-var action_old = '';
-function actionhandler(deze, call){
+function actionhandler(htmlnode, trigger){
 	
-	var action = $(deze).attr("action");
-	var level = $(deze).attr("level");
-	var param = $(deze).attr("param");
-	var fetchmode = $(deze).attr("fetchmode");
-	var form = $(deze).attr("form");
-	var con = $(deze).attr("confirm");
-	var method = $(deze).attr("method");
+	var webappAttributes = ["action", "param", "fetchmode", "formquery", "confirm", "mode", "showhide"];
+	var conf = {};
 	
-	if(call){
-		if(call == 1){
-			var action = $(deze).attr("action_dbtn");
-			var level = $(deze).attr("level_dbtn");
-			var param = $(deze).attr("param_dbtn");
-			var fetchmode = $(deze).attr("fetchmode_dbtn");
-			var form = $(deze).attr("form_dbtn");
-			var con = $(deze).attr("confirm_dbtn");
-			var method = $(deze).attr("method_dbtn");
-		}			
+	$.each(webappAttributes, function(key, value){
+		dbtn = (trigger = 2 ? "_dbtn" : "");
+		conf[value] = $(htmlnode).attr(value+dbtn);
+	});
+	
+	if(!conf.mode){
+		conf.mode = 'ajax';
 	}
 	
-	if(!method){
-		method = 'ajax';
+	if(!conf.formquery){
+		conf.formquery = false;
 	}
 	
-	if(form){
-		
-		if(!fetchmode){
-			fetchmode = 'serelize';
-		}
-		
-		if(method == 'ajax_files'){
-			form = new FormData($('#myform')[0]);
-		}
-		else if(fetchmode == 'serelize'){
-			form = $('#'+form).serialize();
-		}
-		else if(fetchmode == 'serelizeq'){
-			form = $(form).serialize();
-		}
-		else if(fetchmode == 'mceditor'){
-			var id = form;
-			var cke = CKEDITOR.instances[form].getData();
-			form = new FormData();
-			form.append('html', cke);
-			form.append('name', $('#'+id+'_form').find('input[name=name]').val());
-			form.append('desc', $('#'+id+'_form').find('input[name=desc]').val());
-			if($('#'+id+'_form').find('input[name=id]').val()){
-				form.append('id', $('#'+id+'_form').find('input[name=id]').val());
-			}
-			method = 'ajax_files';
-		}
-		else if(fetchmode == 'json'){
-			if(method == 'javascript' || method == 'js'){
-				if(form){
-					form = JSON.parse(form);
-				}
-				else{
-					form = JSON.parse($(deze).html());
-				}
-			}
-			else{
-				if(form){
-					form = [{json:form}];
-				}
-				else{
-					form = [{json:$(deze).html()}];
-				}
-			}
-		}
-		else if(fetchmode == 'this'){
-			if(method == 'javascript' || method == 'js'){
-				form = deze;
-			}
-			else{
-				error('A012','Fetchmode this can only be used by method javascript!');
-			}
-		}
-		else if(fetchmode == 'query'){
-			if(method == 'javascript' || method == 'js'){
-				form = $(form);
-			}
-			else{
-				error('A012','Fetchmode this can only be used by method javascript!');
-			}
-		}
-		else if(fetchmode == 'query_closest'){
-			if(method == 'javascript' || method == 'js'){
-				form = $(deze).closest(form);
-			}
-			else{
-				error('A012','Fetchmode this can only be used by method javascript!');
-			}
-		}
-		else{
-			error('A009','The fetchmode "' +fetchmode+ '" does not exist!');
-		}
-	}
-	else{
-		form = '';
+	if(!conf.param){
+		conf.param = '';
 	}
 	
-	if(param){
-		if(method != 'javascript'){
-			if(method != 'js'){
-				param = '&param='+param;
-			}
-		}
-	}
-	else{
-		param = '';
-	}
-	
-	if(!action){
+	if(!conf.action){
 		error('A001','No action defined');
 		return;
 	}
-	
-	if(!level){
-		level = 'start';
+	else{
+		if(conf.action.indexOf("->") != -1){
+			singlemode = false;
+			conf.action = action.split("->");
+			conf.subaction = action[1];
+			conf.action = action[0];
+		}
+		else{
+			singlemode = true;
+		}
 	}
 	
-	if(con){
-		if(!confirm(con)){
+	if(conf.confirm){
+		if(!confirm(conf.confirm)){
 			return;
 		}
 	}
 	
-	/*
-	
-		to do:
+	if(conf.mode == 'ajax'){
 		
-			*	preloader maken die kijkt of actie nog niet is opgeroepen en dan een preload request meestuurd
+		action_old = conf.action;
 		
-	*/
-	
-	if(method == 'ajax'){
 		//preload
+		if(){
+			
+		}
+		
+		var url = '?';
+		url += 'action=' + conf.action;
+		if(!singlemode){
+			url += '&subaction=' + conf.subaction;
+		}
+		url += '&param=' + conf.param;
+		
 		$.ajax({
-			url: window.action_url+'?action=' + action + '&level=' + level + param,
+			url: action_url+url,
 			type: 'POST',
 			/*xhr: function() {
 				var myXhr = $.ajaxSettings.xhr();
@@ -261,6 +140,14 @@ function actionhandler(deze, call){
 			beforeSend: function () {
 				
 			},*/
+			beforeSend: function () {
+				//maak een laad balkje
+				showHideAjaxLoadAnimation(true, loadbar);
+			},
+			complete: function (){
+				//verwijder laad balkje
+				showHideAjaxLoadAnimation(false, loadbar);
+			},
 			success: function (data) {
 				xhtmlNodesHandler(data);
 			},
@@ -271,36 +158,7 @@ function actionhandler(deze, call){
 			data: form
 		});
 	}
-	else if(method == 'ajax_files'){
-		$.ajax({
-			url: window.action_url+'?action=' + action + '&level=' + level + param,
-			type: 'POST',
-			xhr: function() {
-				var myXhr = $.ajaxSettings.xhr();
-				if(myXhr.upload){
-					myXhr.upload.addEventListener('progress',progress, false);
-				}
-				return myXhr;
-			},
-			beforeSend: function () {
-				$('progress.overalprog').removeAttr("value");
-			},
-			success: function (data) {
-				$('progress.overalprog').attr({value:100,max:100});
-				xhtmlNodesHandler(data);
-				$('progress.uploadprog').attr({value:0,max:100});
-				$('progress.overalprog').attr({value:0,max:100});
-			},
-			error: function () {
-				error('A004','File upload failed');
-			},
-			data: form,
-			cache: false,
-			contentType: false,
-			processData: false
-		});
-	}
-	else if(method == 'javascript' || method == 'js'){
+	else if(conf.mode == 'javascript' || conf.mode == 'js'){
 		if(typeof window[action] == 'function') {
 			var action = new window[action]();
 			action.param = param;
@@ -320,7 +178,7 @@ function actionhandler(deze, call){
 		}
 	}
 	else{
-		error('A008','Method: "' + method + '" does not exist');
+		error('A008','Method: "' + method + '" does not exist. Use ajax or javascript!');
 	}
 	action_old = action;
 }
@@ -337,14 +195,7 @@ function xhtmlNodesHandler(data){
 	//if redirect element exists redirect page
 	$('<wtf/>').html(data).find('redirect').each(function(id, deze) {
 		var location = $(deze).attr("location");
-		var timeout = $(deze).attr("timeout");
-		
-		if(!timeout){
-			timeout = 0;
-		}
-		setTimeout(function() { 
-			window.location.href = location;
-		}, parseInt(timeout));	
+		window.location.replace(location);
 		return;
 	});	
 	
@@ -363,12 +214,21 @@ function xhtmlNodesHandler(data){
 	
 	//get parameters for reload action and excutute that action trough action handler !NOTE! this can create an infinite loop
 	$('<wtf/>').html(data).find('reload').each(function(id, deze) {
-		actionhandler(deze);
+		var location = $(deze).attr("location");
+		var timeout = $(deze).attr("timeout");
+		
+		if(!timeout){
+			timeout = 0;
+		}
+		setTimeout(function() { 
+			window.location.href = location;
+		}, parseInt(timeout));	
+		return;
 	});	
 	
 	// doet hetzelde als reload maar is dan bedoelt om javascript functie aan te roepen
 	$('<wtf/>').html(data).find('action').each(function(id, deze) {
-		actionhandler(deze);
+		actionhandler(deze, 3);
 	});	
 	
 	//create pop-up or window
@@ -708,14 +568,14 @@ function isJSON(data) {
 }
 
 //toont ajax load bar
-function showajaxloader(gonogo){
+function showHideAjaxLoadAnimation(gonogo, query){
 	if(gonogo){
-		$( "#ajax_load_bar" ).show();
-		$( "#ajax_pre_bar" ).hide();
+		$( query+"_load" ).show();
+		$( query+"_pre" ).hide();
 	}
 	else{
-		$( "#ajax_load_bar" ).hide();
-		$( "#ajax_pre_bar" ).show();
+		$( query+"_load" ).hide();
+		$( query+"_pre" ).show();
 	}
 }
 

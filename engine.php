@@ -14,7 +14,7 @@
 			
 			$html = "<h2>Hello world</h2>";
 			
-			if($this->param){
+			if($this->param == 1){
 				$query = '#helloyou';
 			}
 			else{
