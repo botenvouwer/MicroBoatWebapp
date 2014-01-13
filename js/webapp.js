@@ -191,7 +191,7 @@ function actionHandler(htmlnode, trigger){
 				showHideAjaxLoadAnimation(false, loadbar);
 			},
 			success: function (data) {
-				xhtmlNodesHandler(data);
+				AjaxNodesHandler(data);
 			},
 			error: function () {
 				error('A015','Request failed');
@@ -208,7 +208,7 @@ function actionHandler(htmlnode, trigger){
 			if(typeof action[level] == 'function') { 
 				action[level]();
 				if(action.html){
-					xhtmlNodesHandler(action.html);
+					AjaxNodesHandler(action.html);
 				}
 			}
 			else{
@@ -225,8 +225,8 @@ function actionHandler(htmlnode, trigger){
 	action_old = action;
 }
 
-//html xhtmlNodesHandler: loops trough all <start>, <redirect>, <refresh>, <reload>, <action>, <dialog>, <load>, <empty>, <change>, <delete>, <error> elements and loads the data inside the html page or executes the given command.
-function xhtmlNodesHandler(data){
+//html AjaxNodesHandler: loops trough all <start>, <redirect>, <refresh>, <reload>, <action>, <dialog>, <load>, <empty>, <change>, <delete>, <error> elements and loads the data inside the html page or executes the given command.
+function AjaxNodesHandler(data){
 	
 	//load a start element
 	$('<wtf/>').html(data).find('start').each(function(id, deze) {
