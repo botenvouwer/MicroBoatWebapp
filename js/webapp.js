@@ -1,11 +1,12 @@
 /*!
-	webapp 0.0.4 | William © Botenvouwer
+	webapp 0.0.5 | William © Botenvouwer
 */
 
 var singlemode = null;
 var action_old = null;
 var form = null;
 var action_url = '';
+var events = ["click", "change", "mouseenter", "mouseout", "focusout"];
 
 $(document).ready(function () {
 	
@@ -13,17 +14,12 @@ $(document).ready(function () {
 	showajaxloader(false);
 	action_url = $('meta[name="action-url"]').attr("content");
 	
-	//Remove
-	if($('meta[name="dialog-containment"]').length>0){
-		window.containment = $('meta[name="dialog-containment"]').attr('content');
+	if(!action_url){
+		error('A000', 'No action-url specified please specifie meta tag with name action-url in the head of your html document with a action url. This is the url where all ajax request wil be send to!');
 	}
-	else{
-		window.containment = 'html';
-	}
-	//Remove end
 	
-	$(document).find('load').each(function(id, deze) {
-		actionhandler(deze, 0);
+	$(document).find('action').each(function(id, deze){
+		actionHandler(deze, 0);
 		$(deze).remove();
 	});	
 	
@@ -36,22 +32,30 @@ $(document).ready(function () {
 	    showHideAjaxLoadAnimation(false, ".webapp_ajax");
 	});
 	
-	//event handlers for all type of events
+	//set event handlers
+	$(document).ready(function(){
+		$.each(events, function(key, value){
+			$('body').on(value, "[action]", function(e){
+				eventHandler(e, this);
+			});
+		});
+	});
 	
+	//deprecated! Still in use for enter events on forms and esc for dialogs
 	$('body').on('keyup', function(e) {
 		if(e.keyCode === 13){
 			if($('.enter').length > 0){
-				actionhandler($('.enter'), 0);
+				actionHandler($('.enter'), 0);
 			}
 		}	
 		else if(e.keyCode === 27){
 			if($('.close').length > 0){
-				$(".popup").hide();
+				$(".dialog").hide();
 			}
 		}	
 	});
 	
-	//make shure the window wich is drawed is showed up front
+	//make sure the window wich is drawn is showed up front
 	var old_id = 0;
 	$('body').on('mousedown', '.draggable', function(){
 		var id = $(this).attr("id");
@@ -66,15 +70,53 @@ $(document).ready(function () {
 
 //#functions------------------------------------------------------------------------
 
-//action handler looks what to do with a button and executes the desired handling
-function actionhandler(htmlnode, trigger){
+function eventHandler(e, element){
+	
+	var event = ($(element).attr('event') ? $(element).attr('event') : 'click');
+	event = event.split(' ');
+
+	if($.inArray('click', event) != -1 && e.type == 'click'){
+		var that = this;
+		var dblclick = $(that).data('clicks');
+		if(!dblclick){
+			dblclick = 0;
+		}
+		dblclick = dblclick + 1;
+	    $(that).data('clicks', dblclick);
+		
+		if($(that).data('clicks') > 1){
+	    	$(that).data('clicks', 0);
+			actionHandler(element, 'dubbelclick');
+		}	
+		
+	    setTimeout(function() {
+			if($(that).data('clicks') == 1){
+				$(that).data('clicks', 0);
+				actionHandler(element, 'click');
+			}
+	    }, 150);
+		
+	}
+	else if($.inArray('change', event) != -1 && e.type == 'change'){
+		actionHandler(element, e.type);
+	}
+	else if($.inArray('mouseenter', event) != -1 && e.type == 'mouseenter'){
+		actionHandler(element, e.type);
+	}
+	else if($.inArray('mouseout', event) != -1 && e.type == 'mouseout'){
+		actionHandler(element, e.type);
+	}
+}
+
+//action handler can handle action based on html atrributes of an element like a button element
+function actionHandler(htmlnode, trigger){
 	
 	var webappAttributes = ["action", "param", "fetchmode", "formquery", "confirm", "mode", "showhide"];
 	var conf = {};
 	
 	$.each(webappAttributes, function(key, value){
-		dbtn = (trigger = 2 ? "_dbtn" : "");
-		conf[value] = $(htmlnode).attr(value+dbtn);
+		dbtn = (trigger = 'dubbelclick' ? "d" : "");
+		conf[value] = $(htmlnode).attr(dbtn+value);
 	});
 	
 	if(!conf.mode){
@@ -228,7 +270,7 @@ function xhtmlNodesHandler(data){
 	
 	// doet hetzelde als reload maar is dan bedoelt om javascript functie aan te roepen
 	$('<wtf/>').html(data).find('action').each(function(id, deze) {
-		actionhandler(deze, 3);
+		actionHandler(deze, 3);
 	});	
 	
 	//create pop-up or window
@@ -256,6 +298,8 @@ function xhtmlNodesHandler(data){
 	    var height = $(deze).attr("height");
 	    var width = $(deze).attr("width");
 		var html = $(deze).html();
+		
+		containment = 'html';
 		
 		if(!img_url){
 			img_url = "data:image/x-icon;base64,AAABAAEAEBAAAAAAAABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAwgAAAAAAAAAAAAAAnQAAAAAAAAAAAAAAwgAAAP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAADCAAAAAAAAAJ0AAAAAAAAAwgAAAAAAAAAAAAAA/wAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAMIAAACdAAAAwgAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAABcAAAClAAAAAAAAADgAAAAAAAAApQAAABcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFwAAAKUAAAA4AAAApQAAABcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXAAAApQAAABcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAP//AAD//wAA//8AAP//AADwHwAA5s8AANq3AAC8ewAAAAEAAPu/AAD9fwAA/v8AAP//AAD//wAA//8AAA==";
