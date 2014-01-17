@@ -3,10 +3,10 @@
 	include('engine.php');
 	
 	$action = $_REQUEST['action'];
-	$subaction = $_REQUEST['level'];
+	$subaction = $_REQUEST['subaction'];
 	
 	if(!class_exists($action)){
-		echo '<error id="01">Fatal error: action does not exist</error>';
+		echo '<error id="01">Fatal error: action "'.$action.'" does not exist</error>';
 		exit;
 	}
 	
@@ -17,7 +17,7 @@
 	}
 	
 	if(!method_exists($action, $subaction)){
-		echo '<error id="02">Fatal error: level does not exist</error>';
+		echo '<error id="02">Fatal error: level "'.$_REQUEST['action'].'->'.$subaction.'" does not exist</error>';
 		exit;
 	}
 	

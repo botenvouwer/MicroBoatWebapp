@@ -11,7 +11,6 @@ var events = ["click", "change", "mouseenter", "mouseout", "focusout"];
 $(document).ready(function () {
 	
 	//start actions
-	showajaxloader(false);
 	action_url = $('meta[name="action-url"]').attr("content");
 	
 	if(!action_url){
@@ -19,11 +18,12 @@ $(document).ready(function () {
 	}
 	
 	$(document).find('action').each(function(id, deze){
-		actionHandler(deze, 0);
+		actionHandler(deze, 'auto');
 		$(deze).remove();
 	});	
 	
 	//Main ajax load animation functionality
+	$(".loadbar").hide();
 	$(document).ajaxStart(function() {
 	   	showHideAjaxLoadAnimation(true, ".webapp_ajax");
 	});
@@ -111,11 +111,11 @@ function eventHandler(e, element){
 //action handler can handle action based on html atrributes of an element like a button element
 function actionHandler(htmlnode, trigger){
 	
-	var webappAttributes = ["action", "param", "fetchmode", "formquery", "confirm", "mode", "showhide"];
+	var webappAttributes = ["action", "param", "formquery", "fetchmode", "confirm", "mode", "showhide", "loadbar"];
 	var conf = {};
 	
 	$.each(webappAttributes, function(key, value){
-		dbtn = (trigger = 'dubbelclick' ? "d" : "");
+		dbtn = (trigger == 'dubbelclick' ? "d" : "");
 		conf[value] = $(htmlnode).attr(dbtn+value);
 	});
 	
@@ -131,6 +131,10 @@ function actionHandler(htmlnode, trigger){
 		conf.param = '';
 	}
 	
+	if(!conf.loadbar){
+		conf.loadbar = '#loadbar';
+	}
+	
 	if(!conf.action){
 		error('A001','No action defined');
 		return;
@@ -138,9 +142,9 @@ function actionHandler(htmlnode, trigger){
 	else{
 		if(conf.action.indexOf("->") != -1){
 			singlemode = false;
-			conf.action = action.split("->");
-			conf.subaction = action[1];
-			conf.action = action[0];
+			conf.action = conf.action.split("->");
+			conf.subaction = conf.action[1];
+			conf.action = conf.action[0];
 		}
 		else{
 			singlemode = true;
@@ -158,9 +162,9 @@ function actionHandler(htmlnode, trigger){
 		action_old = conf.action;
 		
 		//preload
-		if(){
+		//if(){
 			
-		}
+		//}
 		
 		var url = '?';
 		url += 'action=' + conf.action;
@@ -172,29 +176,30 @@ function actionHandler(htmlnode, trigger){
 		$.ajax({
 			url: action_url+url,
 			type: 'POST',
-			/*xhr: function() {
+			xhr: function() {
 				var myXhr = $.ajaxSettings.xhr();
 				if(myXhr.upload){
-					myXhr.upload.addEventListener('progress',progress, false);
+					myXhr.upload.addEventListener('progress', function(e){progress(e, conf.loadbar)}, false);
 				}
 				return myXhr;
 			},
 			beforeSend: function () {
-				
-			},*/
-			beforeSend: function () {
 				//maak een laad balkje
-				showHideAjaxLoadAnimation(true, loadbar);
+				if(conf.showhide){
+					showHideAjaxLoadAnimation(true, conf.showhide);
+				}
 			},
 			complete: function (){
 				//verwijder laad balkje
-				showHideAjaxLoadAnimation(false, loadbar);
+				if(conf.showhide){
+					showHideAjaxLoadAnimation(false, conf.showhide);
+				}
 			},
 			success: function (data) {
-				AjaxNodesHandler(data);
+				ajaxNodesHandler(data);
 			},
-			error: function () {
-				error('A015','Request failed');
+			error: function (w) {
+				error('A015','Request failed: ' + w.statusText);
 			},
 			contentType: "application/x-www-form-urlencoded;charset=UTF-8",
 			data: form
@@ -208,7 +213,7 @@ function actionHandler(htmlnode, trigger){
 			if(typeof action[level] == 'function') { 
 				action[level]();
 				if(action.html){
-					AjaxNodesHandler(action.html);
+					ajaxNodesHandler(action.html);
 				}
 			}
 			else{
@@ -225,8 +230,8 @@ function actionHandler(htmlnode, trigger){
 	action_old = action;
 }
 
-//html AjaxNodesHandler: loops trough all <start>, <redirect>, <refresh>, <reload>, <action>, <dialog>, <load>, <empty>, <change>, <delete>, <error> elements and loads the data inside the html page or executes the given command.
-function AjaxNodesHandler(data){
+//html ajaxNodesHandler: loops trough all <start>, <redirect>, <refresh>, <reload>, <action>, <dialog>, <load>, <empty>, <change>, <delete>, <error> elements and loads the data inside the html page or executes the given command.
+function ajaxNodesHandler(data){
 	
 	//load a start element
 	$('<wtf/>').html(data).find('start').each(function(id, deze) {
@@ -270,7 +275,7 @@ function AjaxNodesHandler(data){
 	
 	// doet hetzelde als reload maar is dan bedoelt om javascript functie aan te roepen
 	$('<wtf/>').html(data).find('action').each(function(id, deze) {
-		actionHandler(deze, 3);
+		actionHandler(deze, 'ajaxNodeHandler');
 	});	
 	
 	//create pop-up or window
@@ -624,9 +629,9 @@ function showHideAjaxLoadAnimation(gonogo, query){
 }
 
 //handles ajax upload status bar
-function progress(e){
+function progress(e, loadbarquery){
 	if(e.lengthComputable){
-		$('progress.uploadprog').attr({value:e.loaded,max:e.total});
+		$(loadbarquery).attr({value:e.loaded,max:e.total});
 	}
 }
 

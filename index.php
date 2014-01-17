@@ -12,6 +12,6 @@
 		<script type="text/javascript" src="http://localhost:8080/webapp.js/js/webapp.js"></script>
 	</head>
 	<body>
-		<load action="start" param="'string', 23, true" ></load>
+		<action action="start" param="test" ></action>
 	</body>
 </html>
