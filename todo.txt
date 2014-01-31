@@ -4,3 +4,4 @@ refactor param handling: When parrams are made with , then the param would get [
 Make more animations
 refactor animations for load element
 refactor reload en refresh naar juiste redirect normalizatie
+Make a right click event handler wich shows a dialog
