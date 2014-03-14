@@ -1,16 +1,16 @@
 /*!
-	webapp 0.0.5 | William © Botenvouwer
+	webapp 0.0.6 | William © Botenvouwer
 */
 
-var singlemode = null;
-var action_old = null;
+var actionPre = null;
+var jsPre = null;
 var form = null;
 var action_url = '';
-var events = ["click", "change", "mouseenter", "mouseout", "focusout"];
+var events = ["click", "change", "mouseenter", "mouseout", "focusout", "blur", "keypress"];
 
+//#start actions------------------------------------------------------------------------
 $(document).ready(function () {
 	
-	//start actions
 	action_url = $('meta[name="action-url"]').attr("content");
 	
 	if(!action_url){
@@ -35,7 +35,7 @@ $(document).ready(function () {
 	//set event handlers
 	$(document).ready(function(){
 		$.each(events, function(key, value){
-			$('body').on(value, "[action]", function(e){
+			$('body').on(value, "[action][js]", function(e){
 				eventHandler(e, this);
 			});
 		});
@@ -111,16 +111,49 @@ function eventHandler(e, element){
 //action handler can handle action based on html atrributes of an element like a button element
 function actionHandler(htmlnode, trigger){
 	
-	var webappAttributes = ["action", "param", "formquery", "fetchmode", "confirm", "mode", "showhide", "loadbar"];
-	var conf = {};
+	var singlemode = null;
+	var loadingTimeout;
+	var mode = null;
+	var form = false;
+	var formmode = "application/x-www-form-urlencoded;charset=UTF-8";
+	var cache = true;
+	var processData = true;
 	
-	$.each(webappAttributes, function(key, value){
-		dbtn = (trigger == 'dubbelclick' ? "d" : "");
-		conf[value] = $(htmlnode).attr(dbtn+value);
-	});
+	if(typeof htmlnode == 'string'){
+		var webappAttributes = ["action", "js", "param", "formquery", "fetchmode", "confirm", "showhide", "loadbar"];
+		var conf = {};
+		$.each(webappAttributes, function(key, value){
+			dbtn = (trigger == 'dubbelclick' ? "d" : "");
+			conf[value] = $(htmlnode).attr(dbtn+value);
+		});
+	}
+	else if(typeof htmlnode == 'object'){
+		conf = htmlnode;
+	}
+	else{
+		error('A000','actionHandler imput must be object or node!');
+	}
 	
-	if(!conf.mode){
-		conf.mode = 'ajax';
+	if(!conf.action && !conf.js){
+		error('A001','No ajax action or js action defined!');
+		return;
+	}
+	else if(conf.js){
+		mode = 'js';
+		conf.action = conf.js;
+	}
+	else if(conf.action){
+		mode = 'ajax';
+	}
+	
+	if(conf.action.indexOf("->") != -1){
+		singlemode = false;
+		conf.action = conf.action.split("->");
+		conf.subaction = conf.action[1];
+		conf.action = conf.action[0];
+	}
+	else{
+		singlemode = true;
 	}
 	
 	if(!conf.formquery){
@@ -135,31 +168,15 @@ function actionHandler(htmlnode, trigger){
 		conf.loadbar = '#loadbar';
 	}
 	
-	if(!conf.action){
-		error('A001','No action defined');
-		return;
-	}
-	else{
-		if(conf.action.indexOf("->") != -1){
-			singlemode = false;
-			conf.action = conf.action.split("->");
-			conf.subaction = conf.action[1];
-			conf.action = conf.action[0];
-		}
-		else{
-			singlemode = true;
-		}
-	}
-	
 	if(conf.confirm){
 		if(!confirm(conf.confirm)){
 			return;
 		}
 	}
 	
-	if(conf.mode == 'ajax'){
+	if(mode == 'ajax'){
 		
-		action_old = conf.action;
+		actionPre = conf.action;
 		
 		//preload
 		//if(){
@@ -171,7 +188,31 @@ function actionHandler(htmlnode, trigger){
 		if(!singlemode){
 			url += '&subaction=' + conf.subaction;
 		}
-		url += '&param=' + conf.param;
+		
+		var validJson = false;
+		try
+		{
+		  var json = $.parseJSON(conf.param);
+		  validJson = true;
+		}
+		
+		if(formquery){
+			
+			var form = $(formquery);
+			if(form.is("form, input, "){
+				error('A000', 'form query points to element wich is not a form');
+				return;
+			}
+			
+			form = new FormData(form);
+		}
+		
+		if(validJson){
+			// add json to post $_REQUEST['param'] = array('parsedjson');
+		}
+		else{
+			url += '&param=' + conf.param;
+		}
 		
 		$.ajax({
 			url: action_url+url,
@@ -184,14 +225,15 @@ function actionHandler(htmlnode, trigger){
 				return myXhr;
 			},
 			beforeSend: function () {
-				//maak een laad balkje
 				if(conf.showhide){
-					showHideAjaxLoadAnimation(true, conf.showhide);
+					loadingTimeout = setTimeout(function() {
+					   showHideAjaxLoadAnimation(true, conf.showhide);
+					}, 500);
 				}
 			},
 			complete: function (){
-				//verwijder laad balkje
 				if(conf.showhide){
+					clearTimeout(loadingTimeout);
 					showHideAjaxLoadAnimation(false, conf.showhide);
 				}
 			},
@@ -201,11 +243,14 @@ function actionHandler(htmlnode, trigger){
 			error: function (w) {
 				error('A015','Request failed: ' + w.statusText);
 			},
-			contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+			contentType: formmode,
 			data: form
+			cache: cache,
+			processData: processData
 		});
+		actionPre = conf.action;
 	}
-	else if(conf.mode == 'javascript' || conf.mode == 'js'){
+	else if(mode == 'js'){
 		if(typeof window[action] == 'function') {
 			var action = new window[action]();
 			action.param = param;
@@ -223,11 +268,12 @@ function actionHandler(htmlnode, trigger){
 		else{
 			error('A010', 'Action "'+action+'" not found!');
 		}
+		jsPre = conf.js;
 	}
 	else{
 		error('A008','Method: "' + method + '" does not exist. Use ajax or javascript!');
 	}
-	action_old = action;
+	
 }
 
 //html ajaxNodesHandler: loops trough all <start>, <redirect>, <refresh>, <reload>, <action>, <dialog>, <load>, <empty>, <change>, <delete>, <error> elements and loads the data inside the html page or executes the given command.
@@ -259,8 +305,8 @@ function ajaxNodesHandler(data){
 		return;
 	});	
 	
-	//get parameters for reload action and excutute that action trough action handler !NOTE! this can create an infinite loop
-	$('<wtf/>').html(data).find('reload').each(function(id, deze) {
+	//navigate to given location
+	$('<wtf/>').html(data).find('navigate').each(function(id, deze) {
 		var location = $(deze).attr("location");
 		var timeout = $(deze).attr("timeout");
 		
@@ -273,7 +319,7 @@ function ajaxNodesHandler(data){
 		return;
 	});	
 	
-	// doet hetzelde als reload maar is dan bedoelt om javascript functie aan te roepen
+	//handle a action !NOTE! this can create an infinite loop
 	$('<wtf/>').html(data).find('action').each(function(id, deze) {
 		actionHandler(deze, 'ajaxNodeHandler');
 	});	
@@ -559,7 +605,7 @@ function ajaxNodesHandler(data){
 		}
 	});
 	
-	// empty an node by id
+	// empty an node by jquery
 	$('<wtf/>').html(data).find('empty').each(function(id, deze) {
 		var query = $(deze).attr("query");
 		if(!query){
@@ -569,7 +615,7 @@ function ajaxNodesHandler(data){
 		$(query).empty();
 	});	
 
-	// change a nodes attributes by id
+	// change a nodes attributes by jquery
 	$('<wtf/>').html(data).find('change').each(function(id, deze) {
 		var query = $(deze).attr("id");
 		
@@ -583,7 +629,7 @@ function ajaxNodesHandler(data){
 		});
 	});	
 	
-	// delete a node by id
+	// delete a node by jquery
 	$('<wtf/>').html(data).find('delete').each(function(id, deze) {
 		var query = $(deze).attr("query");
 		if(!query){
@@ -597,6 +643,12 @@ function ajaxNodesHandler(data){
 	$('<wtf/>').html(data).find('error').each(function(id, deze) {
 		var html = $(deze).html();
 		error('P'+$(deze).attr("id"), html);
+	});
+	
+	//makes alert popup
+	$('<wtf/>').html(data).find('alert').each(function(id, deze) {
+		var html = $(deze).html();
+		alert(html);
 	});
 }
 

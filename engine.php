@@ -22,7 +22,7 @@
 					<ul>
 						<li><button action='start' param='1' >hallo</button></li>
 						<li><button action='testcase->load' >load me</button></li>
-						<li><button >append me</button></li>
+						<li><button action='testcase->append'>append me</button></li>
 					</ul>
 					<div id='helloyou'>
 						$html
@@ -48,7 +48,7 @@
 		}
 		
 		function append(){
-			
+			echo '<load query="#helloyou" effect="fade_fast" method="append">This is appended</load>';
 		}
 		
 	}
