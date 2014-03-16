@@ -1,6 +1,6 @@
 Finish jquery ui window
 refactor action and level based action calling
-refactor param handling: When parrams are made with , then the param would get [] for every , sepreted item exept when there is just one value
+refactor param handling: with one mode and json mode
 Make more animations
 refactor animations for load element
 refactor reload en refresh naar juiste redirect normalizatie

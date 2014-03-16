@@ -1,20 +1,20 @@
 /*!
-	webapp 0.0.6 | William © Botenvouwer
+	webapp 0.0.7 | William © Botenvouwer
 */
 
 var actionPre = null;
 var jsPre = null;
 var form = null;
-var action_url = '';
+var actionUrl = 'http://' + location.host + '/ajax.php';
 var events = ["click", "change", "mouseenter", "mouseout", "focusout", "blur", "keypress"];
 
 //#start actions------------------------------------------------------------------------
 $(document).ready(function () {
 	
-	action_url = $('meta[name="action-url"]').attr("content");
+	var prospectUrl = $('meta[name="action-url"]');
 	
-	if(!action_url){
-		error('A000', 'No action-url specified please specifie meta tag with name action-url in the head of your html document with a action url. This is the url where all ajax request wil be send to!');
+	if(prospectUrl.length != 0){
+		actionUrl = prospectUrl.attr("content");
 	}
 	
 	$(document).find('action').each(function(id, deze){
@@ -35,7 +35,7 @@ $(document).ready(function () {
 	//set event handlers
 	$(document).ready(function(){
 		$.each(events, function(key, value){
-			$('body').on(value, "[action][js]", function(e){
+			$('body').on(value, "[action],[js]", function(e){
 				eventHandler(e, this);
 			});
 		});
@@ -87,7 +87,7 @@ function eventHandler(e, element){
 		if($(that).data('clicks') > 1){
 	    	$(that).data('clicks', 0);
 			actionHandler(element, 'dubbelclick');
-		}	
+		}
 		
 	    setTimeout(function() {
 			if($(that).data('clicks') == 1){
@@ -95,7 +95,6 @@ function eventHandler(e, element){
 				actionHandler(element, 'click');
 			}
 	    }, 150);
-		
 	}
 	else if($.inArray('change', event) != -1 && e.type == 'change'){
 		actionHandler(element, e.type);
@@ -119,8 +118,8 @@ function actionHandler(htmlnode, trigger){
 	var cache = true;
 	var processData = true;
 	
-	if(typeof htmlnode == 'string'){
-		var webappAttributes = ["action", "js", "param", "formquery", "fetchmode", "confirm", "showhide", "loadbar"];
+	if(typeof htmlnode == 'string' || htmlnode instanceof HTMLElement){
+		var webappAttributes = ["action", "js", "param", "formquery", "confirm", "showhide", "loadbar"];
 		var conf = {};
 		$.each(webappAttributes, function(key, value){
 			dbtn = (trigger == 'dubbelclick' ? "d" : "");
@@ -189,33 +188,33 @@ function actionHandler(htmlnode, trigger){
 			url += '&subaction=' + conf.subaction;
 		}
 		
-		var validJson = false;
-		try
-		{
-		  var json = $.parseJSON(conf.param);
-		  validJson = true;
-		}
-		
+		var form = null;
 		if(formquery){
-			
-			var form = $(formquery);
-			if(form.is("form, input, "){
+			var formquery = $(formquery);
+			if(formquery.is("form")){
 				error('A000', 'form query points to element wich is not a form');
 				return;
 			}
 			
-			form = new FormData(form);
+			if(formquery.find("input[type=file]").length > 0){
+				cache = false;
+				processData = false;
+			}
+			
+			var form = new FormData(formquery[0]);
 		}
 		
-		if(validJson){
-			// add json to post $_REQUEST['param'] = array('parsedjson');
+		try
+		{
+		  var json = $.parseJSON(conf.param);
+		  form.appendChild('param',json);
 		}
-		else{
+		catch(e){
 			url += '&param=' + conf.param;
 		}
 		
 		$.ajax({
-			url: action_url+url,
+			url: actionUrl+url,
 			type: 'POST',
 			xhr: function() {
 				var myXhr = $.ajaxSettings.xhr();
@@ -244,7 +243,7 @@ function actionHandler(htmlnode, trigger){
 				error('A015','Request failed: ' + w.statusText);
 			},
 			contentType: formmode,
-			data: form
+			data: form,
 			cache: cache,
 			processData: processData
 		});
