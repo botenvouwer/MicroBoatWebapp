@@ -2,3 +2,36 @@ body{
 	margin:0px;
 	padding:0px;
 }
+
+#main{
+	width: 800px;
+	margin: 20px auto;
+	border: 1px solid;
+}
+
+	header{
+		border-bottom: 1px solid;
+		height: 65px;
+		position: relative;
+	}
+		
+		header ul{
+			list-style: none;
+			margin: 0px;
+			padding: 0px;
+			display: flex;
+			position: absolute;
+			bottom: 0px;
+		}
+			
+			header ul li{
+				
+			}
+	
+	#main section{
+		padding: 10px;
+	}
+	
+	#main section h1{
+		margin: 0px;
+	}

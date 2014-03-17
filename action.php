@@ -3,7 +3,7 @@
 	include('engine.php');
 	
 	$action = $_REQUEST['action'];
-	$subaction = $_REQUEST['subaction'];
+	$subaction = (isset($_REQUEST['subaction']) ? $_REQUEST['subaction'] : '');
 	
 	if(!class_exists($action)){
 		echo '<error id="01">Fatal error: action "'.$action.'" does not exist</error>';

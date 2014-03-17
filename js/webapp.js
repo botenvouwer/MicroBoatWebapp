@@ -1,7 +1,8 @@
 /*!
-	webapp 0.0.7 | William © Botenvouwer
+	webapp 0.0.8 | William © Botenvouwer
 */
 
+var preLoads = true;
 var actionPre = null;
 var jsPre = null;
 var form = null;
@@ -114,7 +115,7 @@ function actionHandler(htmlnode, trigger){
 	var loadingTimeout;
 	var mode = null;
 	var form = false;
-	var formmode = "application/x-www-form-urlencoded;charset=UTF-8";
+	var contentType = "application/x-www-form-urlencoded;charset=UTF-8";
 	var cache = true;
 	var processData = true;
 	
@@ -159,10 +160,6 @@ function actionHandler(htmlnode, trigger){
 		conf.formquery = false;
 	}
 	
-	if(!conf.param){
-		conf.param = '';
-	}
-	
 	if(!conf.loadbar){
 		conf.loadbar = '#loadbar';
 	}
@@ -177,10 +174,12 @@ function actionHandler(htmlnode, trigger){
 		
 		actionPre = conf.action;
 		
-		//preload
-		//if(){
-			
-		//}
+		if(preLoads){
+			//preload
+			//if(){
+				
+			//}
+		}
 		
 		var url = '?';
 		url += 'action=' + conf.action;
@@ -189,28 +188,46 @@ function actionHandler(htmlnode, trigger){
 		}
 		
 		var form = null;
-		if(formquery){
-			var formquery = $(formquery);
-			if(formquery.is("form")){
+		var fileMode = false;
+		if(conf.formquery){
+			var formquery = $(conf.formquery);
+			
+			if(formquery.length == 0){
+				error('A000', 'Form not found: ' + conf.formquery);
+				return;
+			}
+			
+			if(!formquery.is("form")){
 				error('A000', 'form query points to element wich is not a form');
 				return;
 			}
 			
 			if(formquery.find("input[type=file]").length > 0){
-				cache = false;
+				contentType = false;
 				processData = false;
+				cache = false;
+				form = new FormData(formquery[0]);
+				fileMode = true;
 			}
-			
-			var form = new FormData(formquery[0]);
+			else{
+				form = formquery.serialize();
+			}
 		}
 		
-		try
-		{
-		  var json = $.parseJSON(conf.param);
-		  form.appendChild('param',json);
-		}
-		catch(e){
-			url += '&param=' + conf.param;
+		if(conf.param){
+			try
+			{
+				var json = $.parseJSON(conf.param);
+				if(fileMode){
+				  	form.appendChild('param',json);
+				}
+				else{
+				  form += '&' + $.param(json);
+				}
+			}
+			catch(e){
+				url += '&param=' + conf.param;
+			}		
 		}
 		
 		$.ajax({
@@ -242,8 +259,8 @@ function actionHandler(htmlnode, trigger){
 			error: function (w) {
 				error('A015','Request failed: ' + w.statusText);
 			},
-			contentType: formmode,
 			data: form,
+			contentType: contentType,
 			cache: cache,
 			processData: processData
 		});
@@ -553,19 +570,60 @@ function ajaxNodesHandler(data){
 				easing: 'swing'
 			};
 		}
-		else if(animate == 'down'){
-			var effectout = 'drop';
-			var timeout = 500;
+		else if(animate == 'slidedown'){
+			var effectout = 'fade';
+			var timeout = 300;
 			var optionsout = {
-				direction: "down",
 				easing: 'swing'
 			};
 			
-			var effectin = 'drop';
-			var timein = 500;
+			var effectin = 'slide';
+			var timein = 600;
+			var optionsin = {
+				direction: "up",
+				easing: 'easeInOutQuad'
+			};
+		}
+		else if(animate == 'slideup'){
+			var effectout = 'fade';
+			var timeout = 300;
+			var optionsout = {
+				easing: 'swing'
+			};
+			
+			var effectin = 'slide';
+			var timein = 600;
 			var optionsin = {
 				direction: "down",
+				easing: 'easeInOutQuad'
+			};
+		}
+		else if(animate == 'slideleft'){
+			var effectout = 'fade';
+			var timeout = 300;
+			var optionsout = {
 				easing: 'swing'
+			};
+			
+			var effectin = 'slide';
+			var timein = 600;
+			var optionsin = {
+				direction: "right",
+				easing: 'easeInOutQuad'
+			};
+		}
+		else if(animate == 'slideright'){
+			var effectout = 'fade';
+			var timeout = 300;
+			var optionsout = {
+				easing: 'swing'
+			};
+			
+			var effectin = 'slide';
+			var timein = 600;
+			var optionsin = {
+				direction: "left",
+				easing: 'easeInOutQuad'
 			};
 		}
 		else{
