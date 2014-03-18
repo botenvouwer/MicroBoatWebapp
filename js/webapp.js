@@ -713,18 +713,6 @@ function error(n,e){
 	console.log('[Error '+n+': '+e+']');
 }
 
-// Controleer of daratype wel json is en geeft json terug als dat dat is anders false
-function isJSON(data) {
-	var isJson = false
-	try{
-       	var json = $.parseJSON(data);
-       	isJson = typeof json === 'object';
-    }catch (ex) {
-    	console.error('data is not JSON');
-    }
-    return [isJson, json];
-}
-
 //toont ajax load bar
 function showHideAjaxLoadAnimation(gonogo, query){
 	if(gonogo){

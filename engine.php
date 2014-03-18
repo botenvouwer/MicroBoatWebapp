@@ -23,10 +23,10 @@
 						<header>
 							<ul id='menu'>
 								<li><button action='start' param='1' >Home</button></li>
-								<li><button action='testcase->load' >overwrite</button></li>
-								<li><button action='testcase->append' >append</button></li>
-								<li><button action='testcase->form' >From</button></li>
-								<li><button action='testcase->files' >From with files</button></li>
+								<li><button action='ajaxBasic' >Basic ajax</button></li>
+								<li><button action='testcase->append' >Advanced ajax</button></li>
+								<li><button action='testcase->form' >Forms with ajax</button></li>
+								<li><button action='testcase->files' >Basic javascript</button></li>
 							</ul>
 						</header>	
 						<section id='content'>
@@ -43,6 +43,46 @@
 					$html
 				</load>
 			";
+		}
+		
+	}
+	
+	class ajaxBasic{
+		
+		function main(){
+			$html = $this->load();
+			echo "
+				<load query='#content'>
+					<nav>
+						<button action='ajaxBasic->load' >Home</button>
+						<button >Basic ajax</button>
+						<button >Advanced ajax</button>
+						<button >Forms with ajax</button>
+						<button >Basic javascript</button>
+					</nav>
+					<section>
+						$html
+					</section>
+				</load>
+			";
+		}
+		
+		function load(){
+			return "
+				hello
+			";
+		}
+		
+		function loadAdvanced(){
+			
+		}
+		
+		function delete(){
+			
+		}
+		
+		function append(){
+			
 		}
 		
 	}
