@@ -1,6 +1,17 @@
 body{
 	margin:0px;
 	padding:0px;
+	font-family: arial;
+	font-size: 16px;
+}
+
+a{
+	color:rgb(39, 39, 219);
+}
+
+a:hover{
+	color:rgb(221, 42, 42);
+	cursor: pointer;
 }
 
 #main{
@@ -28,10 +39,40 @@ body{
 				
 			}
 	
-	#main section{
-		
+	#main > section{
+		display: flex;
+		min-height: 400px;
 	}
 	
-	#main section h1{
+	#main h1{
 		margin: 0px;
+		font-size: 24px;
 	}
+	
+	#main h2{
+		margin: 0px;
+		font-size: 20px;
+	}
+	
+	#main h3{
+		margin: 0px;
+		font-size: 18px;
+	}
+	
+		.subnav{
+			display: flex;
+			flex-direction: column;
+			width: 160px;
+			border-right: 1px solid;
+		}
+		
+			.subnav button{
+				
+			}
+			
+		#main > section section{
+			padding:10px;
+			width: 100%;
+		}
+	
+	

@@ -34,6 +34,7 @@ $(document).ready(function () {
 	});
 	
 	//set event handlers
+	//todo: Scan doc and only create event handlers where they are needed
 	$(document).ready(function(){
 		$.each(events, function(key, value){
 			$('body').on(value, "[action],[js]", function(e){
@@ -219,10 +220,18 @@ function actionHandler(htmlnode, trigger){
 			{
 				var json = $.parseJSON(conf.param);
 				if(fileMode){
+					if(form == null){
+						form = new FormData();
+					}
 				  	form.appendChild('param',json);
 				}
 				else{
-				  form += '&' + $.param(json);
+					if(form == null){
+						form = $.param(json);
+					}
+					else{
+						form += '&' + $.param(json);
+					}
 				}
 			}
 			catch(e){
@@ -294,12 +303,6 @@ function actionHandler(htmlnode, trigger){
 
 //html ajaxNodesHandler: loops trough all <start>, <redirect>, <refresh>, <reload>, <action>, <dialog>, <load>, <empty>, <change>, <delete>, <error> elements and loads the data inside the html page or executes the given command.
 function ajaxNodesHandler(data){
-	
-	//load a start element
-	$('<wtf/>').html(data).find('start').each(function(id, deze) {
-		var html = $(deze).html();
-		$('body').html(html);
-	});	
 	
 	//if redirect element exists redirect page
 	$('<wtf/>').html(data).find('redirect').each(function(id, deze) {
