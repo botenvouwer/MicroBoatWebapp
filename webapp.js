@@ -96,7 +96,7 @@ function eventHandler(e, element){
 				$(that).data('clicks', 0);
 				actionHandler(element, 'click');
 			}
-	    }, 150);
+	    }, 200);
 	}
 	else if($.inArray('change', event) != -1 && e.type == 'change'){
 		actionHandler(element, e.type);
@@ -132,7 +132,7 @@ function actionHandler(htmlnode, trigger){
 		conf = htmlnode;
 	}
 	else{
-		error('A000','actionHandler imput must be object or node!');
+		error('A000','actionHandler input must be object or node!');
 	}
 	
 	if(!conf.action && !conf.js){

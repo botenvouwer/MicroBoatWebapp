@@ -27,7 +27,7 @@
 						<header>
 							<ul id='menu'>
 								<li><button action='start' param='1' >Home</button></li>
-								<li><button action='start' >Instalation</button></li>
+								<li><button action='start->installation' >Installation</button></li>
 								<li><button action='ajaxBasic' >Basic ajax</button></li>
 								<li><button action='ajaxAdvanced' >Advanced ajax</button></li>
 								<li><button action='testcase->form' >Forms with ajax</button></li>
@@ -46,6 +46,100 @@
 			echo "
 				<load query='$query'>
 					$html
+				</load>
+			";
+		}
+		
+		function installation(){
+			
+			$html = "
+<meta name='action-url' content='http://mydom.com/controler/action.php'>
+			";
+			
+			$html = trim($html);
+			$html = htmlentities($html);
+			
+			$html2 = '
+<script src="http://mydom.com/js/jquery.js"></script>
+<script src="http://mydom.com/js/jqueryui.js"></script>
+<script src="http://mydom.com/js/webapp.js"></script>
+			';
+			
+			$html2 = trim($html2);
+			$html2 = htmlentities($html2);
+			
+			$html3 = '
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>PaperBoat Webapp 0.0.8</title>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+		<meta name="action-url" content="http://localhost/action.php">
+		<script src="http://localhost/jquery.js"></script>
+		<script src="http://localhost/jqueryui.js"></script>
+		<script src="http://localhost/webapp.js"></script>
+	</head>
+	<body>
+		<action action="start" param="test" ></action>
+	</body>
+</html>
+			';
+			
+			$html3 = trim($html3);
+			$html3 = htmlentities($html3);
+			
+			$html4 = '
+<?php
+	
+	$action = $_REQUEST["action"]
+	
+	if($action == "start"){
+		echo "
+			<load query\'body\'>
+				<button action=\'test\'>test</button> 
+				<div id=\'target\'></div>
+			</load>
+		";
+	}
+	elseif($action == "test"){
+		echo "<load query=\'#target\'>hello world</load>";
+	}
+	
+?>
+			';
+			
+			$html4 = trim($html4);
+			$html4 = htmlentities($html4);
+			
+			
+			
+			echo "
+				<load query='#content'>
+					<section>
+						<h1>How to instal PaperBoat Webapp</h1><br>
+						
+						<h2>Installation</h2>
+						<p>The following Javascript libraries are required to run PaperBoat Webapp. I try to keep up with new distrubutions of these libraries and current supported versions are also distributed with this github download.</p>
+						<ul>
+							<li><a href='http://jquery.com/'>Jquery</a> - 2.1</li>
+							<li><a href='https://jqueryui.com/'>Jquery UI</a> - 1.10</li>
+						</ul>
+						<p>I assume you know this but I note it any way. You need to add jquery.js, jqueryui.js and webapp.js in that order to your html file.</p>
+						<pre><code>$html2</code></pre>
+						
+						<h2>Configuration</h2>
+						<p>The basic ideology behind the PaperBoat Webapp is easy ajax handling. Therefor you must define a meta tag containing the location of the webserver ajax handler. The name of the meta tag must be <i>'action-url'</i>. Most commenly this is a path to a php file like ajax.php from where all the php calls are handled.</p>
+						<pre><code>$html</code></pre>
+						<p>If you do not set this mannulay it will automatically be set to: <i>'./ajax.php'</i></p>
+						
+						<h2>Example</h2>
+						<p>Try just to copy paste this and it should work.</p>
+						<h3>index.html</h3>
+						<pre><code>$html3</code></pre>
+						<h3>action.php</h3>
+						<pre><code>$html4</code></pre>
+						
+					</section>
 				</load>
 			";
 		}
