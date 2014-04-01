@@ -1,5 +1,5 @@
 /*!
-	webapp 0.0.8 | William © Botenvouwer
+	webapp 0.0.9 | William © Botenvouwer
 */
 
 var preLoads = true;
@@ -78,6 +78,9 @@ function eventHandler(e, element){
 	event = event.split(' ');
 
 	if($.inArray('click', event) != -1 && e.type == 'click'){
+		
+		actionHandler(element, 'click');
+		/*
 		var that = this;
 		var dblclick = $(that).data('clicks');
 		if(!dblclick){
@@ -97,6 +100,7 @@ function eventHandler(e, element){
 				actionHandler(element, 'click');
 			}
 	    }, 200);
+	    */
 	}
 	else if($.inArray('change', event) != -1 && e.type == 'change'){
 		actionHandler(element, e.type);
