@@ -32,6 +32,7 @@
 								<li><button action='ajaxAdvanced' >Advanced ajax</button></li>
 								<li><button action='testcase->form' >Forms with ajax</button></li>
 								<li><button action='testcase->files' >Basic javascript</button></li>
+								<li><button action='testcase->todo' >Todo</button></li>
 							</ul>
 						</header>	
 						<section id='content'>
@@ -413,6 +414,32 @@
 		
 		function mouseenter(){
 			echo '<load query="#content" >mouseenter triggerd</load>';
+		}
+		
+		function todo(){
+			echo '
+				<load query="#content" >
+					<section>
+						<h1>Todo:</h1>
+						<dl>
+							<dt>Local form validation,</dt>
+							<dd>To localy validate ajax forms</dd>
+							<dt>Advanced event handlers,</dt>
+							<dd>To trigger action or js based on given events</dd>
+							<dt>Animationing system,</dt>
+							<dd>So all return actions can be animated</dd>
+							<dt></dt>
+							<dd></dd>
+							<dt></dt>
+							<dd></dd>
+							<dt></dt>
+							<dd></dd>
+							<dt></dt>
+							<dd></dd>
+						</dl>
+					</section>
+				</load>
+			';
 		}
 		
 		function form(){
