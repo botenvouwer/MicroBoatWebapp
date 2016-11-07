@@ -1,0 +1,19 @@
+{
+  "load":{
+    "query":".target",
+    "html":"<h1>Hello world</h1>"
+  },
+  "redirect":"/this/page",
+  "refresh":0,
+  "navigate":"/this/page",
+  "action":"/ajax/count",
+  "script":"alert('hello world')",
+  "empty":".emptyme",
+  "delete":".removeme",
+  "change":{
+    "query":"#button",
+    "attributes":{
+      "class":"done"
+    }
+  }
+}

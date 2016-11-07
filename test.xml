@@ -1,0 +1,5 @@
+<ajax>
+    <load query=".target">
+        <i>This is loaded with the xml package</i>
+    </load>
+</ajax>

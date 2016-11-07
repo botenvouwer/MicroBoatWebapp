@@ -1,0 +1,6 @@
+{
+  "load":{
+    "query":".target",
+    "html":"<i><b>Hello world</b></i>"
+  }
+}
