@@ -1,5 +1,5 @@
 /*!
-	MicroBoatWebapp 0.1.0 | William © Botenvouwer
+	MicroBoatWebapp 0.1.1 | William © Botenvouwer
 */
 
 //#Set configuration
@@ -11,10 +11,12 @@ var animations = {};
 //#Execute initialization operations
 $(function () {
 
+	$('.ajaxSpinner').hide();
+
 	//action elements are executed after dom has loaded
 	$(document).find('action').each(function(id, context){
 		actionHandler(context);
-	});	
+	});
 	
 	//Main ajax spinners
 	$(".mbwAjaxSpinner").hide();
@@ -68,7 +70,7 @@ function actionHandler(actionElement){
 	var form = null;
 	var type = 'GET';
 	var contentType = "application/x-www-form-urlencoded;charset=UTF-8";
-	var cache = true;
+	var cache = false;
 	var processData = true;
 	var conf = {};
 	var source = null;
@@ -81,7 +83,7 @@ function actionHandler(actionElement){
 		if(actionElement instanceof HTMLElement)
 			source = actionElement;
 
-		var mbwAttributes = ["action", "formdata", "confirm", "spinner", "loadbar", "before", "after", "error"];
+		var mbwAttributes = ["action", "formdata", "confirm", "spinner", "loadbar", "before", "after", "error", "cache"];
 		$.each(mbwAttributes, function(key, value){
 			conf[value] = $(actionElement).attr(value);
 		});
@@ -99,7 +101,7 @@ function actionHandler(actionElement){
 		return;
 	}
 	else if(!urlCheck.test(conf.action)){
-		error('A001','Action has to be valid url');
+		error('A002','Action has to be valid url');
 		return;
 	}
 	
@@ -109,16 +111,20 @@ function actionHandler(actionElement){
 		}
 	}
 
+	if(conf.cache == 'true'){
+		cache = true;
+	}
+
 	if(conf.formdata){
 		var formdata = $(conf.formdata);
 		type = 'POST';
 
 		if(formdata.length == 0){
-			error('A000', 'Form not found: ' + conf.formdata);
+			error('A003', 'Form not found: ' + conf.formdata);
 			return;
 		}
 		else if(!formdata.is("form")){
-			error('A000', 'Formdata query points to element which is not a form');
+			error('A004', 'Formdata query points to element which is not a form');
 			return;
 		}
 
@@ -455,12 +461,12 @@ function error(n,e){
 //shows ajax spinner
 function showHideAjaxLoadAnimation(gonogo, query){
 	if(gonogo){
-		$( query+"_load" ).show();
-		$( query+"_pre" ).hide();
+		$(query+"_load").show();
+		$(query+"_pre").hide();
 	}
 	else{
-		$( query+"_load" ).hide();
-		$( query+"_pre" ).show();
+		$(query+"_load").hide();
+		$(query+"_pre").show();
 	}
 }
 

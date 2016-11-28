@@ -1,6 +1,6 @@
 {
   "load":{
     "query":".target",
-    "html":"<p>you pressed the button</p><button action=\"test.json\">test action after dom manipulation</button>"
+    "html":"<p>you pressed the button aaaa</p><button action=\"test.json\">test action after dom manipulation</button>"
   }
 }
